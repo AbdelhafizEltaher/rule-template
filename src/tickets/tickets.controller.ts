@@ -1,14 +1,46 @@
-import { Controller, Get, Param, Delete } from "@nestjs/common";
+import { Controller, Get, Param, Delete, Post, Body } from "@nestjs/common";
 import { TicketsService } from "./tickets.service";
 import { Types } from "mongoose";
+import { EmailService } from "src/email/email.service";
 
 @Controller("tickets")
 export class TicketsController {
-  constructor(private readonly ticketsService: TicketsService) {}
+  constructor(
+    private readonly ticketsService: TicketsService,
+    private emailService: EmailService,
+  ) {}
 
   @Get()
   findAll() {
     return this.ticketsService.findAll();
+  }
+
+  @Post("email")
+  async requestReview(
+    @Body()
+    body: {
+      email: string;
+      firstName: string;
+      documentName: string;
+      referenceNumber: string;
+      dueDate: string;
+      reviewLink: string;
+    },
+  ) {
+    await this.emailService.sendReviewNotification(body.email, {
+      firstName: body.firstName,
+      dueDate: body.dueDate,
+      reviewLink: body.reviewLink,
+      content: `Please review the document "${body.documentName}" by clicking the link below.`,
+      title: `Review Request for ${body.documentName}`,
+      status: "Pending",
+      severity: "Critical",
+    });
+
+    return {
+      success: true,
+      message: "Review notification sent successfully",
+    };
   }
 
   @Get(":id")
@@ -36,7 +68,6 @@ export class TicketsController {
   }
   @Get("create-initial/:ruleId")
   createInitialTickets(@Param("ruleId") ruleId: string) {
-    // Convert ruleId string to Types.ObjectId
     const objectId = new Types.ObjectId(ruleId);
     return this.ticketsService.createInitialTickets(objectId);
   }

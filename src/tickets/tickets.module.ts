@@ -5,6 +5,7 @@ import { Action, ActionSchema } from '../actions/schemas/action.schema';
 import { Rule, RuleSchema } from '../rules/schemas/rule.schema';
 import { TicketsService } from './tickets.service';
 import { TicketsController } from './tickets.controller';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TicketsController } from './tickets.controller';
       { name: Action.name, schema: ActionSchema },
       { name: Rule.name, schema: RuleSchema },
     ]),
+    EmailModule
   ],
   controllers: [TicketsController],
   providers: [TicketsService],

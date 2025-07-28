@@ -2,8 +2,9 @@ import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Ticket, TicketDocument } from "./schemas/ticket.schema";
-import { Action, ActionDocument } from "../actions/schemas/action.schema";
+import { Action } from "../actions/schemas/action.schema";
 import { Rule, RuleDocument } from "../rules/schemas/rule.schema";
+import { EmailService } from "src/email/email.service";
 
 @Injectable()
 export class TicketsService {
@@ -11,16 +12,12 @@ export class TicketsService {
 
   constructor(
     @InjectModel(Ticket.name) private ticketModel: Model<TicketDocument>,
-    @InjectModel(Action.name) private actionModel: Model<ActionDocument>,
     @InjectModel(Rule.name) private ruleModel: Model<RuleDocument>,
+    private readonly emailService: EmailService,
   ) {}
 
   async createInitialTickets(ruleId: Types.ObjectId): Promise<Ticket[]> {
-
     const rule = await this.ruleModel.findOne({ id: ruleId }).exec();
-
-    console.log(rule);
-
     if (!rule) throw new Error("Rule not found");
 
     const createdTickets: Ticket[] = [];
@@ -37,15 +34,15 @@ export class TicketsService {
         continue;
       }
 
-      console.log(condition);
-
       if (rule.conditionType === "ALL") {
         const ticket = await this.createTicketFromAction(
           ruleId,
           condition,
           null,
         );
-        createdTickets.push(ticket);
+        if (ticket) {
+          createdTickets.push(ticket);
+        }
       } else if (rule.conditionType === "EACH") {
         for (let i = 0; i < 10; i++) {
           const ticket = await this.createTicketFromAction(
@@ -53,7 +50,9 @@ export class TicketsService {
             condition,
             null,
           );
-          createdTickets.push(ticket);
+          if (ticket) {
+            createdTickets.push(ticket);
+          }
         }
       }
     }
@@ -65,14 +64,26 @@ export class TicketsService {
     ruleId: Types.ObjectId,
     action: Action,
     parentTicketId: string | null,
-  ): Promise<Ticket> {
+  ): Promise<Ticket | null> {
     const users = action.usersIds;
-    if (
-      !users ||
-      (users.length === 0 &&
-        (action.type === "VERIFICATION" || action.type === "ESCALATION"))
-    ) {
+    if (!users || (users.length === 0 && action.type === "VERIFICATION")) {
       throw new Error("No users available for assignment");
+    }
+
+    if (action.type === "NOTIFICATION") {
+      await this.emailService.sendReviewNotification(
+        "aeltaher@fpconsultancy.com",
+        {
+          firstName: "Abdelhafiz Ibrahim ALi Eltaher ",
+          dueDate: "2025-12-31",
+          reviewLink: "http://example.com/review",
+          title: "Review Request for Document",
+          status: "Pending",
+          severity: "Critical",
+          content: `Please review the document "${action.title}" by clicking the link below.`,
+        },
+      );
+      return null;
     }
 
     // Get next user in round-robin
@@ -93,8 +104,6 @@ export class TicketsService {
       severity: action.severity,
       content: action.content,
     };
-
-    console.log({ ticketData });
 
     const ticket = new this.ticketModel(ticketData);
     return ticket.save();
@@ -183,7 +192,9 @@ export class TicketsService {
         childAction,
         currentTicket.id,
       );
-      childTickets.push(childTicket);
+      if (childTicket) {
+        childTickets.push(childTicket);
+      }
     }
 
     return { currentTicket, childTickets };
