@@ -23,10 +23,6 @@ export declare class TicketsService {
         deletedCount: number;
     }>;
     getMyActiveTickets(userId: string): Promise<Ticket[]>;
-    getTicketsStates(): Promise<{
-        status: string;
-        count: number;
-    }[]>;
     getTicketsStatusSummary(): Promise<{
         total: number;
         statuses: {

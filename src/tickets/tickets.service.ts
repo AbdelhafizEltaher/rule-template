@@ -104,7 +104,8 @@ export class TicketsService {
       type: action.type,
       severity: action.severity,
       content: action.content,
-      dueDate: new Date(), // Set to current date for simplicity
+      // Set dueDate to one week from now
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     };
 
     const ticket = new this.ticketModel(ticketData);
@@ -246,54 +247,6 @@ export class TicketsService {
       })
       .exec();
   }
-
-  async getTicketsStates(): Promise<{ status: string; count: number }[]> {
-    try {
-      console.log(`Fahd `);
-      const totalTickets = await this.ticketModel.countDocuments({});
-      console.log(`Total tickets in collection: ${totalTickets}`);
-
-      // Verify the status field exists in some documents
-      const sampleDocs = await this.ticketModel
-        .find({ status: { $exists: true } })
-        .limit(5);
-      console.log("Sample documents with status:", sampleDocs);
-
-      const result = await this.ticketModel
-        .aggregate([
-          {
-            $match: { status: { $exists: true } }, // Only documents with status field
-          },
-          {
-            $group: {
-              _id: "$status",
-              count: { $sum: 1 },
-            },
-          },
-          {
-            $project: {
-              status: "$_id",
-              count: 1,
-              _id: 0,
-            },
-          },
-          {
-            $sort: { count: -1 },
-          },
-        ])
-        .exec();
-
-      console.log("Aggregation result:", result);
-      return result.map((item: { status: string; count: number }) => ({
-        status: String(item.status),
-        count: Number(item.count),
-      })) as { status: string; count: number }[];
-    } catch (error) {
-      console.error("Error in getTicketsStates:", error);
-      throw new Error("Failed to retrieve ticket states");
-    }
-  }
-
 
 
   async getTicketsStatusSummary(): Promise<{ 
