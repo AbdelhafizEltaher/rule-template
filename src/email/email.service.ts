@@ -11,8 +11,8 @@ export class EmailService {
     this.transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
+        user: 'abdelhafiz.eltaher.98@gmail.com',
+        pass: 'bvymxfsgwflolflp',
       },
     });
   }
@@ -32,8 +32,8 @@ export class EmailService {
   ): Promise<void> {
     const { html, text } = this.templateService.getReviewNotificationTemplate({
       ...data,
-      senderName: process.env.EMAIL_SENDER_NAME || "Support Team",
-      companyName: process.env.COMPANY_NAME || "Our Company",
+      senderName: "Remote Sensing Platform",
+      companyName: "Remote Sensing Platform",
       currentYear: new Date().getFullYear(),
       userEmail: email,
       content: data.content,
