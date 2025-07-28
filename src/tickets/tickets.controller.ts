@@ -90,4 +90,9 @@ export class TicketsController {
   async getMyActiveTickets(@Param("userId") userId: string) {
     return this.ticketsService.getMyActiveTickets(userId);
   }
+
+  @Get("status-summary")
+  async getStatusSummary() {
+    return this.ticketsService.getTicketsStatusSummary();
+  }
 }

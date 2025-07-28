@@ -11,8 +11,7 @@ export class Ticket {
     default: () => new Types.ObjectId(),
   })
   id: Types.ObjectId;
-  @Prop({   type: Types.ObjectId,
-    required: true, })
+  @Prop({ type: Types.ObjectId, required: true })
   ruleId: Types.ObjectId;
 
   @Prop({ required: true })
@@ -32,6 +31,9 @@ export class Ticket {
 
   @Prop()
   responseTime: Date;
+
+  @Prop()
+  dueDate: Date;
 
   @Prop()
   responseBy: string;

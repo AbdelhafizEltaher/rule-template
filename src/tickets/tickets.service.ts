@@ -104,6 +104,7 @@ export class TicketsService {
       type: action.type,
       severity: action.severity,
       content: action.content,
+      dueDate: new Date(), // Set to current date for simplicity
     };
 
     const ticket = new this.ticketModel(ticketData);
@@ -245,4 +246,105 @@ export class TicketsService {
       })
       .exec();
   }
+
+  async getTicketsStates(): Promise<{ status: string; count: number }[]> {
+    try {
+      console.log(`Fahd `);
+      const totalTickets = await this.ticketModel.countDocuments({});
+      console.log(`Total tickets in collection: ${totalTickets}`);
+
+      // Verify the status field exists in some documents
+      const sampleDocs = await this.ticketModel
+        .find({ status: { $exists: true } })
+        .limit(5);
+      console.log("Sample documents with status:", sampleDocs);
+
+      const result = await this.ticketModel
+        .aggregate([
+          {
+            $match: { status: { $exists: true } }, // Only documents with status field
+          },
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              status: "$_id",
+              count: 1,
+              _id: 0,
+            },
+          },
+          {
+            $sort: { count: -1 },
+          },
+        ])
+        .exec();
+
+      console.log("Aggregation result:", result);
+      return result.map((item: { status: string; count: number }) => ({
+        status: String(item.status),
+        count: Number(item.count),
+      })) as { status: string; count: number }[];
+    } catch (error) {
+      console.error("Error in getTicketsStates:", error);
+      throw new Error("Failed to retrieve ticket states");
+    }
+  }
+
+
+
+  async getTicketsStatusSummary(): Promise<{ 
+  total: number;
+  statuses: { status: string; count: number }[];
+}> {
+  try {
+    // Get total count of all tickets
+    const total = await this.ticketModel.countDocuments({});
+
+    // If no tickets exist, return early
+    if (total === 0) {
+      return { total: 0, statuses: [] };
+    }
+
+    // Get count grouped by status
+    const statusCounts = await this.ticketModel.aggregate([
+      {
+        $match: { status: { $exists: true } } // Only count documents with status
+      },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          status: "$_id",
+          count: 1,
+          _id: 0
+        }
+      },
+      {
+        $sort: { count: -1 } // Optional: sort by count descending
+      }
+    ]);
+
+    // Ensure all statuses are strings and counts are numbers
+    const normalizedStatuses = statusCounts.map((item : {status : string , count : number }) => ({
+      status: String(item.status),
+      count: Number(item.count)
+    }));
+
+    return {
+      total,
+      statuses: normalizedStatuses
+    };
+  } catch (error) {
+    console.error('Error in getTicketsStatusSummary:', error);
+    throw new Error('Failed to retrieve ticket status summary');
+  }
+}
 }
