@@ -1,11 +1,16 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ActionsModule } from './actions/actions.module';
+/* eslint-disable prettier/prettier */
+import { Module } from "@nestjs/common";
+import { MongooseModule } from "@nestjs/mongoose";
+import { ActionsModule } from "./actions/actions.module";
+import { TicketsModule } from './tickets/tickets.module';
+import { RulesModule } from './rules/rules.module';
 
 @Module({
-  imports: [ActionsModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    MongooseModule.forRoot("mongodb+srv://abdelhafizeltaher98:2cnbIrzeNA22vRWe@cluster0.4corqcq.mongodb.net/"),
+    ActionsModule,
+    TicketsModule,
+    RulesModule,
+  ],
 })
 export class AppModule {}
