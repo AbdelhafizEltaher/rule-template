@@ -35,6 +35,7 @@ export class TicketsController {
       title: `Review Request for ${body.documentName}`,
       status: "Pending",
       severity: "Critical",
+      type: "Notification Email",
     });
 
     return {

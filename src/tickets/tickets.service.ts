@@ -70,7 +70,7 @@ export class TicketsService {
       throw new Error("No users available for assignment");
     }
 
-    if (action.type === "NOTIFICATION") {
+    if (action.type === "NOTIFICATION" || action.type === "ESCALATION") {
       await this.emailService.sendReviewNotification(
         "aeltaher@fpconsultancy.com",
         {
@@ -81,6 +81,7 @@ export class TicketsService {
           status: "Pending",
           severity: "Critical",
           content: `Please review the document "${action.title}" by clicking the link below.`,
+          type: action.type,
         },
       );
       return null;

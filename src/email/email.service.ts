@@ -27,6 +27,7 @@ export class EmailService {
       status: string;
       severity: string;
       content: string;
+      type: string; // Optional field for notification type
     },
   ): Promise<void> {
     const { html, text } = this.templateService.getReviewNotificationTemplate({
@@ -39,7 +40,7 @@ export class EmailService {
       severity: data.severity,
       status: data.status,
       title: data.title,
-      type: "Notification Email",
+      type: data.type || "Notification",
     });
 
     const mailOptions = {
