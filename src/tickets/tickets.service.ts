@@ -256,6 +256,8 @@ export class TicketsService {
   try {
     // Get total count of all tickets
     const total = await this.ticketModel.countDocuments({});
+    console.log(`Total tickets: ${total}`);
+    
 
     // If no tickets exist, return early
     if (total === 0) {
@@ -283,7 +285,7 @@ export class TicketsService {
       {
         $sort: { count: -1 } // Optional: sort by count descending
       }
-    ]);
+    ]).exec();
 
     // Ensure all statuses are strings and counts are numbers
     const normalizedStatuses = statusCounts.map((item : {status : string , count : number }) => ({

@@ -194,6 +194,7 @@ let TicketsService = class TicketsService {
     async getTicketsStatusSummary() {
         try {
             const total = await this.ticketModel.countDocuments({});
+            console.log(...oo_oo(`3449783934_259_4_259_42_4`, `Total tickets: ${total}`));
             if (total === 0) {
                 return { total: 0, statuses: [] };
             }
@@ -217,7 +218,7 @@ let TicketsService = class TicketsService {
                 {
                     $sort: { count: -1 }
                 }
-            ]);
+            ]).exec();
             const normalizedStatuses = statusCounts.map((item) => ({
                 status: String(item.status),
                 count: Number(item.count)
@@ -228,7 +229,7 @@ let TicketsService = class TicketsService {
             };
         }
         catch (error) {
-            console.error(...oo_tx(`1243638564_299_4_299_61_11`, 'Error in getTicketsStatusSummary:', error));
+            console.error(...oo_tx(`3449783934_301_4_301_61_11`, 'Error in getTicketsStatusSummary:', error));
             throw new Error('Failed to retrieve ticket status summary');
         }
     }

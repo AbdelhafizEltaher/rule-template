@@ -7,7 +7,7 @@ export declare class Ticket {
     userId: string;
     parentTicketId: string;
     status: "pending" | "completed" | "cancelled";
-    responseType: string;
+    responseType: "YES" | "NO" | "NOT_SURE";
     responseTime: Date;
     dueDate: Date;
     responseBy: string;

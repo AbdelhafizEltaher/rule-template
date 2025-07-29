@@ -68,7 +68,7 @@ let TicketsController = class TicketsController {
     async getMyActiveTickets(userId) {
         return this.ticketsService.getMyActiveTickets(userId);
     }
-    async getStatusSummary() {
+    getStatusSummary() {
         return this.ticketsService.getTicketsStatusSummary();
     }
 };
@@ -144,10 +144,10 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], TicketsController.prototype, "getMyActiveTickets", null);
 __decorate([
-    (0, common_1.Get)("status-summary"),
+    (0, common_1.Get)("info/status-summary"),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
+    __metadata("design:returntype", void 0)
 ], TicketsController.prototype, "getStatusSummary", null);
 exports.TicketsController = TicketsController = __decorate([
     (0, common_1.Controller)("tickets"),

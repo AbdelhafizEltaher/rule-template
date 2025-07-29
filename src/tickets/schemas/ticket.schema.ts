@@ -27,7 +27,7 @@ export class Ticket {
   status: "pending" | "completed" | "cancelled";
 
   @Prop()
-  responseType: string; // 'YES', 'NO', 'NOT_SURE'
+  responseType: "YES" | "NO" | "NOT_SURE";
 
   @Prop()
   responseTime: Date;

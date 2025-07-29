@@ -91,8 +91,8 @@ export class TicketsController {
     return this.ticketsService.getMyActiveTickets(userId);
   }
 
-  @Get("status-summary")
-  async getStatusSummary() {
+  @Get("info/status-summary")
+  getStatusSummary() {
     return this.ticketsService.getTicketsStatusSummary();
   }
 }
